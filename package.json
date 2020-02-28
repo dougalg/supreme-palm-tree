@@ -1,0 +1,37 @@
+{
+  "name": "supreme-palm-tree",
+  "version": "0.0.1",
+  "description": "A sample project for a Wikipedia job posting",
+  "main": "index.js",
+  "scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "npm run lint:js && npm run lint:css",
+		"lint:js": "eslint -c .eslintrc.js src/js/**/*.js",
+		"lint:css": "stylelint --config .stylelintrc src/css/**/*.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dougalg/supreme-palm-tree.git"
+  },
+  "keywords": [
+    "supreme",
+    "palm",
+    "tree",
+    "wikipedia",
+    "i18n",
+    "a11y",
+    "internationalization",
+    "accessibility"
+  ],
+  "author": "Dougal Graham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dougalg/supreme-palm-tree/issues"
+  },
+  "homepage": "https://github.com/dougalg/supreme-palm-tree#readme",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "stylelint": "^13.2.0",
+    "stylelint-config-standard": "^20.0.0"
+  }
+}
