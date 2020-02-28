@@ -4,10 +4,11 @@
   "description": "A sample project for a Wikipedia job posting",
   "main": "index.js",
   "scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "npm run lint:js && npm run lint:css",
-		"lint:js": "eslint -c .eslintrc.js src/js/**/*.js",
-		"lint:css": "stylelint --config .stylelintrc src/css/**/*.css"
+    "test": "echo \"Error: no test specified\" && exit 1",
+		"serve": "http-server ./src --cors",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint -c .eslintrc.js src/js/**/*.js",
+    "lint:css": "stylelint --config .stylelintrc src/css/**/*.css"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
   "homepage": "https://github.com/dougalg/supreme-palm-tree#readme",
   "devDependencies": {
     "eslint": "^6.8.0",
+    "http-server": "^0.12.1",
     "stylelint": "^13.2.0",
     "stylelint-config-standard": "^20.0.0"
   }
