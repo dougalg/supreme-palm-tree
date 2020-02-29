@@ -8,8 +8,8 @@ Because this project uses ES6 modules, it needs to be served on a web server. Ei
 using your own webserver, or for your convenience, one is provided here:
 
 ```
+npm install
 npm run serve
 ```
 
 This will run a simple http server on port 8080, and you should be able to access it at `http://127.0.0.1:8080`.
-```
