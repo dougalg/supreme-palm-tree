@@ -40,13 +40,32 @@ const addNewOl = (uls) => {
 };
 
 export function renderToc({ toc, isRtl }) {
+	return createNav(toc.title, renderTocOl(toc.entries, isRtl));
+}
+
+function createTitle(title) {
+	const h2 = document.createElement('h2');
+	h2.innerHTML = title;
+	return h2;
+}
+
+const tocOlId = 'toc__toc';
+function createNav(title, toc) {
+	const nav = document.createElement('nav');
+	nav.setAttribute('aria-describedby', tocOlId);
+	nav.appendChild(createTitle(title));
+	nav.appendChild(toc);
+	return nav;
+
+}
+
+function renderTocOl(entries, isRtl) {
 	let ols = [];
 	const ol = createOl(isRtl);
-	ol.id = 'toc';
 
 	let previousLevel = 1;
 	ols.push(ol);
-	toc.entries.forEach((entry) => {
+	entries.forEach((entry) => {
 		if (previousLevel < entry.level) {
 			ols = addNewOl(ols);
 		}
