@@ -1,8 +1,12 @@
 const createOl = (isRtl) => {
 	const ol = document.createElement('ol');
-	if (isRtl) {
-		ol.classList.add('toc--is-rtl');
-	}
+	/**
+	 * Because the standard counters are hidden, we need to set aria-role to list
+	 * if we want screen readers to read it as a list. There is some debate about
+	 * how necessary this is, but I feel it is a better experience in this use case.
+	 */
+	ol.setAttribute('aria-role', 'list');
+	ol.classList.add('toc__list');
 	return ol;
 };
 
@@ -22,6 +26,8 @@ const createAnchor = (html, counter) => {
 
 const createLi = ({ html, number }) => {
 	const li = document.createElement('li');
+	// See above comment for OL regarding aria roles
+	li.setAttribute('aria-role', 'listitem');
 	const counter = createSpan(number, 'toc__counter');
 	const text = createSpan(html, [ 'toc__text' ]);
 	const anchor = createAnchor(text, counter);
@@ -40,7 +46,7 @@ const addNewOl = (uls) => {
 };
 
 export function renderToc({ toc, isRtl }) {
-	return createNav(toc.title, renderTocOl(toc.entries, isRtl));
+	return createNav(toc.title, isRtl, renderTocOl(toc.entries));
 }
 
 function createTitle(title) {
@@ -49,19 +55,26 @@ function createTitle(title) {
 	return h2;
 }
 
-const tocOlId = 'toc__toc';
-function createNav(title, toc) {
+const TOC_TITLE_ID = 'toc__toc';
+function createNav(titleText, isRtl, toc) {
+	const title = createTitle(titleText);
+	title.id = TOC_TITLE_ID;
+
 	const nav = document.createElement('nav');
-	nav.setAttribute('aria-describedby', tocOlId);
-	nav.appendChild(createTitle(title));
+	nav.setAttribute('aria-describedby', TOC_TITLE_ID);
+	nav.appendChild(title);
 	nav.appendChild(toc);
+	nav.classList.add('toc');
+	if (isRtl) {
+		nav.classList.add('toc--is-rtl');
+	}
 	return nav;
 
 }
 
-function renderTocOl(entries, isRtl) {
+function renderTocOl(entries) {
 	let ols = [];
-	const ol = createOl(isRtl);
+	const ol = createOl();
 
 	let previousLevel = 1;
 	ols.push(ol);

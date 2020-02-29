@@ -16,7 +16,12 @@ export class App {
 			replaceEl(initialSelectBox, selectBox);
 		});
 
-		selectBox.addEventListener('change', () => this.performTocFetch());
+		selectBox.addEventListener('change', () => {
+			const title = this.articleTitleField.value.replace(/\s/g, '');
+			if (title.length > 0) {
+				this.performTocFetch();
+			}
+		});
 		searchForm.addEventListener('submit', (e) => {
 			e.preventDefault();
 			this.performTocFetch();

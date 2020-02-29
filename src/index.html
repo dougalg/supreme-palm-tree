@@ -19,12 +19,14 @@
 	<main>
 		<h1>Wikipedia Article Searcher</h1>
 		<p>Use the form to search for a Wikipedia article by title, and language.</p>
-		<form id="article-search">
+		<form id="article-search" class="article-search-form">
 			<label for="article-title">Article Title:</label> <input type="text" id="article-title" name="article-title" required>
 			<label for="article-language">Article Language:</label>
 			<select id="article-language" name="article-language">
 			</select>
-			<input id="search-button" type="submit" value="Submit Search" />
+			<div class="article-search-form__submit">
+				<input id="search-button" type="submit" value="Submit Search" />
+			</div>
 		</form>
 		<nav id="toc-container" aria-describedby="toc__title" style="display: none;"></nav>
 		<article id="error-not-found" style="display: none;" aria-live="polite">
