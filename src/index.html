@@ -29,27 +29,32 @@
 			</div>
 		</form>
 		<nav id="toc-container" aria-describedby="toc__title" style="display: none;"></nav>
-		<article id="error-not-found" style="display: none;" aria-live="polite">
-			<h2>Not Found</h2>
+		<article id="status-container" aria-live="polite"></article>
+		<template id="error-not-found">
+			<article>
+				<h2>Not Found</h2>
 
-			<p>
-				Sorry, but we couldn't find that article in your language. Please check that you typed the title correctly.
-			</p>
-		</article>
-		<article id="error-misc" style="display: none;" aria-live="polite">
-			<h2>Something Went Wrong</h2>
+				<p>
+					Sorry, but we couldn't find that article in your language. Please check that you typed the title correctly.
+				</p>
+			</article>
+		</template>
+		<template id="error-misc">
+			<article>
+				<h2>Something Went Wrong</h2>
 
-			<p>
-				Sorry but something went wrong!
-			</p>
-		</article>
+				<p>
+					Sorry but something went wrong!
+				</p>
+			</article>
+		</template>
 	</main>
 	<script type="module">
 		import { $ } from './js/dom.js';
 		import { App } from './js/app.js';
 
 		const app = new App();
-		app.setContainers($('#error-not-found'), $('#error-misc'), $('#toc-container'));
+		app.setContainers($('#error-not-found'), $('#error-misc'), $('#toc-container'), $('#status-container'));
 		app.initForm($('#article-search'), $('#article-language'), $('#article-title'));
 	</script>
 </body>

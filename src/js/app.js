@@ -6,6 +6,15 @@ import { cloneSelectBoxWithLanguageOptions } from './components/select.js';
 import { renderToc } from './components/toc.js';
 
 
+const STATUS = {
+	LOADING: Symbol(),
+	LOADED: Symbol(),
+	NOT_FOUND_ERROR: Symbol(),
+	MISC_ERROR: Symbol(),
+};
+
+const sanitizeTitle = (title) => title.replace(' ', '_');
+
 export class App {
 	constructor() {}
 
@@ -16,6 +25,13 @@ export class App {
 			replaceEl(initialSelectBox, selectBox);
 		});
 
+		/**
+		 * Changing the page content based on a select box value change is unexpected behaviour, and not
+		 * recommended as it can cause a variety of issues for users with accessibility needs.
+		 *
+		 * If this were a real project, I would recommend against this pattern, but have implemented
+		 * it for now, as it was requested.
+		 */
 		selectBox.addEventListener('change', () => {
 			const title = this.articleTitleField.value.replace(/\s/g, '');
 			if (title.length > 0) {
@@ -31,8 +47,8 @@ export class App {
 		this.articleTitleField = articleTitleField;
 	}
 
-	setContainers(errorNotFound, errorMisc, toc, tocTitle) {
-		this.tocTitle = tocTitle;
+	setContainers(errorNotFound, errorMisc, toc, statusContainer) {
+		this.statusContainer = statusContainer;
 		this.toc = toc;
 		this.errorNotFound = errorNotFound;
 		this.errorMisc = errorMisc;
@@ -41,15 +57,17 @@ export class App {
 	performTocFetch() {
 		const langCode = this.selectBox.value;
 		const isRtl = LANGUAGES[langCode].isRtl;
-		const errorHidePromise = this.hideErrors();
-		fetchPageByTitleAndLanguage(this.articleTitleField.value, this.selectBox.value)
+		const errorHidePromise = this.setStatus(STATUS.LOADING);
+		const articleTitle = sanitizeTitle(this.articleTitleField.value);
+		fetchPageByTitleAndLanguage(articleTitle, this.selectBox.value)
 			.then((resp) => resp.ok ? resp.json() : Promise.reject(resp))
-			.then(({ toc }) => ({ toc, isRtl }))
+			.then(({ toc }) => ({ toc, isRtl, langCode, articleTitle }))
 			.then(renderToc)
 			// Ensure that errors are already hidden before rendering new TOC, to avoid confusing the user
 			.then((toc) => errorHidePromise.then(() => toc))
 			.then((toc) => this.insertToc(toc))
-			.catch((e) => this.renderError(e));
+			.then(() => this.setStatus(STATUS.LOADED))
+			.catch((e) => this.handleError(e));
 	}
 
 	insertToc(newToc) {
@@ -59,21 +77,35 @@ export class App {
 		});
 	}
 
-	hideErrors() {
+
+	setStatus(status) {
 		return raf(() => {
-			toggleVisible(this.errorNotFound, false);
-			toggleVisible(this.errorMisc, false);
+			this.statusContainer.innerHTML = this.getStatusText(status);
 		});
 	}
 
-	renderError(resp) {
+	getStatusText(status) {
+		switch (status) {
+		case STATUS.LOADED:
+			return 'Content loaded.';
+		case STATUS.LOADING:
+			return 'Fetching content.';
+		case STATUS.NOT_FOUND_ERROR:
+			return this.errorNotFound.cloneNode(true).innerHTML;
+		case STATUS.MISC_ERROR:
+		default:
+			return this.errorMisc.cloneNode(true).innerHTML;
+		}
+	}
+
+	handleError(resp) {
 		return raf(() => {
 			toggleVisible(this.toc, false);
 			if (resp.status === 404) {
-				toggleVisible(this.errorNotFound, true);
+				this.setStatus(STATUS.NOT_FOUND_ERROR);
 			}
 			else {
-				toggleVisible(this.errorMisc, true);
+				this.setStatus(STATUS.MISC_ERROR);
 			}
 			console.log(resp);
 		});

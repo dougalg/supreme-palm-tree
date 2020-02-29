@@ -1,3 +1,12 @@
+ol {
+	padding-left: 1rem;
+}
+
+.toc--is-rtl ol {
+	padding-left: 0;
+	padding-right: 1rem;
+}
+
 .article-search-form {
 	display: grid;
 	grid-template-columns: auto 1fr;
