@@ -1,4 +1,4 @@
-# supreme-palm-tree
+# supreme-palm-tree 🌴
 
 A sample project to demonstrate the usage of Wikipedia's APIs.
 
