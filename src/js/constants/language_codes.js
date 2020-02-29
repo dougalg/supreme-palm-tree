@@ -1,0 +1,10 @@
+export const ARABIC = 'ar';
+export const ARMENIAN = 'hy';
+export const ENGLISH = 'en';
+export const GREEK = 'el';
+export const HEBREW = 'he';
+export const INUKTITUT = 'iu';
+export const JAPANESE = 'jp';
+export const KANNADA = 'ka';
+export const SCOTS = 'sco';
+export const THAI = 'th';

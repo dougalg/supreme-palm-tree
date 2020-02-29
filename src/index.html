@@ -16,10 +16,103 @@
 	<!--[if IE]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
 	<![endif]-->
+	<main>
+		<h1>Wikipedia Article Searcher</h1>
+		<p>Use the form to search for a Wikipedia article by title, and language.</p>
+		<form id="article-search">
+			<label for="article-title">Article Title:</label> <input type="text" id="article-title" name="article-title" required>
+			<label for="article-language">Article Language:</label>
+			<select id="article-language" name="article-language">
+			</select>
+			<input id="search-button" type="submit" value="Submit Search" />
+		</form>
+		<div id="toc-container">
+			<ul id="toc"></ul>
+		</div>
+		<article id="error-not-found" style="display: none;">
+			<h2>Not Found</h2>
 
-	<!-- Add your site or application content here -->
-	<p>Hello world! This is HTML5 Boilerplate.</p>
-	<script type="module" src="./js/app.js"></script>
+			<p>
+				Sorry, but we couldn't find that article in your language. Please check that you typed the title correctly.
+			</p>
+		</article>
+		<article id="error-misc" style="display: none;">
+			<h2>Something Went Wrong</h2>
+
+			<p>
+				Sorry but something went wrong!
+			</p>
+		</article>
+	</main>
+	<script type="module">
+		import { LANGUAGES } from './js/constants/languages.js';
+		import { $, replaceEl, toggleVisible } from './js/dom.js';
+		import { raf } from './js/raf.js';
+		import { fetchPageByTitleAndLanguage } from './js/api.js';
+		import { cloneSelectBoxWithLanguageOptions } from './js/components/select.js';
+		import { renderToc } from './js/components/toc.js';
+
+		// References to DOM elements we'll want to manipulate later
+		const articleTitleField = $('#article-title');
+		const oldSelectBox = $('#article-language');
+		const errorNotFound = $('#error-not-found')
+		const errorMisc = $('#error-misc')
+		let toc = $('#toc');
+
+		const selectBox = cloneSelectBoxWithLanguageOptions(oldSelectBox, LANGUAGES);
+		// Given the simplicity of the page, RAF isn't super necessary here
+		raf(() => {
+			replaceEl(oldSelectBox, selectBox);
+		});
+
+		const searchForm = $('#article-search');
+		selectBox.addEventListener('change', performTocFetch);
+		searchForm.addEventListener('submit', (e) => {
+			e.preventDefault();
+			performTocFetch();
+		});
+
+		function performTocFetch() {
+			const langCode = selectBox.value;
+			const isRtl = LANGUAGES[langCode].isRtl;
+			const errorHidePromise = hideErrors();
+			fetchPageByTitleAndLanguage(articleTitleField.value, selectBox.value)
+				.then((resp) => resp.ok ? resp.json() : Promise.reject(resp))
+				.then(({ toc }) => ({ toc, isRtl }))
+				.then(renderToc)
+				// Ensure that errors are already hidden before rendering new TOC, to avoid confusing the user
+				.then((toc) => errorHidePromise.then(() => toc))
+				.then(insertToc)
+				.catch(renderError);
+		}
+
+		function insertToc(newToc) {
+			return raf(() => {
+				replaceEl(toc, newToc);
+				toc = newToc;
+			});
+		}
+
+		function hideErrors() {
+			return raf(() => {
+				toggleVisible(errorNotFound, false);
+				toggleVisible(errorMisc, false);
+			});
+		}
+
+		function renderError(resp) {
+			return raf(() => {
+				toggleVisible(toc, false);
+				if (resp.status === 404) {
+					toggleVisible(errorNotFound, true);
+				}
+				else {
+					toggleVisible(errorMisc, true);
+					console.log(resp);
+				}
+			});
+		}
+	</script>
 </body>
 
 </html>
